@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { GiChefToque, GiForkKnifeSpoon } from "react-icons/gi";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   FiHome,
   FiBook,
@@ -14,7 +14,10 @@ import { useCart } from "../../CartContext/CartContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const location=useLocation();
   const { totalItem } = useCart();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const navLinks = [
     { name: "Home", to: "/", icon: <FiHome /> },
@@ -96,9 +99,89 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* MOBILE MENU */} -> time=> 36:22
+          {/* MOBILE MENU */}
+          <div className="md:hidden flex items-center mr-2">
+            <button
+              className="text-amber-500 hover:text-amber-300 focus:outline-none transition-all p-1 rounded-xl border-2 border-amber-900/30 hover:border-amber-600/50 relative shadow-md shadow-amber-900/20 hover:shadow-lg hover:shadow-amber-500/30"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <div className="space-y-2 relative">
+                <span
+                  className={`block w-6 h-[2px] bg-current transition-all duration-300 ${
+                    isOpen ? "rotate-45 translate-y-[10px]" : ""
+                  }`}
+                />
+                <span
+                  className={`block w-6 h-[2px] bg-current transition-all duration-300 ${
+                    isOpen ? "opacity-0" : ""
+                  }`}
+                />
+                <span
+                  className={`block w-6 h-[2px] bg-current transition-all duration-300 ${
+                    isOpen ? "-rotate-45 -translate-y-[10px]" : ""
+                  }`}
+                />
+              </div>
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* MOBILE NAVIGATION DROPDOWN */}
+      {isOpen && (
+        <div className="md:hidden bg-[#2D180E] border-t-4 border-amber-900/40 relative shadow-lg shadow-amber-950/30 w-full">
+          <div className="px-4 py-4 space-y-2">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.name}
+                to={link.to}
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  `block px-4 py-3 text-sm rounded-xl transition-all items-center ${
+                    isActive
+                      ? "bg-amber-600/30 text-amber-400"
+                      : "text-amber-100 hover:bg-amber-600/20"
+                  } border-2 ${
+                    isActive ? "border-amber-600/50" : "border-amber-900/30"
+                  }`
+                }
+              >
+                <span className="mr-3 text-amber-500">{link.icon}</span>
+                {link.name}
+              </NavLink>
+            ))}
+
+            <div className="pt-4 border-t-2 border-amber-900/30 space-y-2">
+              <NavLink to='/cart' onClick={() => setIsOpen(false)}
+              className='w-full px-4 py-3 text-center text-amber-100 rounded-xl border-2 border-amber-900/30 hover:border-amber-600/50 items-center justify-center space-x-2 text-sm'>
+                <FiShoppingCart className="text-lg" />
+                {totalItem > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-amber-600 text-amber-100 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {totalItem}
+                  </span>
+                )}
+              </NavLink>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LOGIN MODAL */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-[#2D1B0E] to-[#4a372a] rounded-xl p-6 w-full max-w-[480px] relative border-4 border-amber-700/30 shadow-[0_0_30px] shadow-amber-500/30">
+            <button onClick={() => navigate('/')}
+              className=" absolute top-2 right-2 text-amber-500 hover:text-amber-300 text-2xl ">
+                &times;
+              </button>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent mb-4 text-center">
+                Foodie-Frency
+              </h2>
+              <Login onLoginSuccess={handleLogin} onClose={() => navigate{'/'}} />
+          </div>
+        </div>
+      )}
+
     </nav>
   );
 };
