@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+@keyframes orbit-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes counter-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+.animate-orbit {
+  animation: orbit-rotate 40s linear infinite;
+}
+
+.animate-counter-orbit {
+  animation: counter-rotate 40s linear infinite;
+}

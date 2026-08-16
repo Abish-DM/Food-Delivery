@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GiChefToque, GiForkKnifeSpoon } from "react-icons/gi";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   FiHome,
   FiBook,
@@ -11,13 +11,82 @@ import {
   FiKey,
 } from "react-icons/fi";
 import { useCart } from "../../CartContext/CartContext";
+import Login from "../Login/Login";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const location=useLocation();
+  const location = useLocation();
   const { totalItem } = useCart();
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const showLoginModal = location.pathname === "/login";
+
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    Boolean(localStorage.getItem("loginData")),
+  );
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsAuthenticated(Boolean(localStorage.getItem("loginData")));
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const handleLoginSuccess = () => {
+    localStorage.setItem("loginData", JSON.stringify({ loggedIn: true }));
+    setIsAuthenticated(true);
+    navigate("/");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("loginData");
+    setIsAuthenticated(false);
+  };
+
+  // EXTRACT DESKTOP AUTH BUTTON
+  const renderDesktopAuthButton = () => {
+    return isAuthenticated ? (
+      <button
+        onClick={handleLogout}
+        className=" px-3 md:px-3 lg:px-6 py-1.5 md:py-2 lg:py-3 bg-gradient-to-br from-amber-500 to-amber-700 text-[#2D1B0E] rounded-2xl font-bold hover:shadow-lg hover:shadow-amber-600/40 transition-all transform hover:scale-[1.02] border-2 border-amber-600/20 flex items-center space-x-2 shadow-md shadow-amber-900/20 text-xs md:text-sm lg:text-sm"
+      >
+        <FiLogOut className=" text-base md:text-lg lg:text-lg" />
+        <span className=" text-shadow">Logout</span>
+      </button>
+    ) : (
+      <button
+        onClick={() => navigate("/login")}
+        className=" px-3 md:px-3 lg:px-6 py-1.5 md:py-2 lg:py-3 bg-gradient-to-br from-amber-700 to-amber-700 text-[#2D1B0E] rounded-2xl font-bold hover:shadow-lg hover:shadow-amber-600/40 transition-all transform hover:scale-[1.02] border-2 border-amber-600/20 flex items-center space-x-2 shadow-md shadow-amber-900/20 text-xs md:text-sm lg:text-sm"
+      >
+        <FiKey className=" text-base md:text-lg lg:text-lg" />
+        <span className=" text-shadow">Login</span>
+      </button>
+    );
+  };
+
+  // EXTRACT MOBILE AUTH BTN
+  const renderMobileAuthButton = () => {
+    return isAuthenticated ? (
+      <button
+        onClick={handleLogout}
+        className="w-full px-4 py-3 bg-gradient-to-br from-amber-500 to-amber-700 text-[#2D1B0E] rounded-xl font-semibold flex items-center justify-center space-x-2 text-sm"
+      >
+        <FiLogOut />
+        <span>Logout</span>
+      </button>
+    ) : (
+      <button
+        onClick={() => {
+          navigate("/login");
+          setIsOpen(false);
+        }}
+        className="w-full px-4 py-3 bg-gradient-to-br from-amber-500 to-amber-700 text-[#2D1B0E] rounded-xl font-semibold flex items-center justify-center space-x-2 text-sm"
+      >
+        <FiKey />
+        <span>Login</span>
+      </button>
+    );
+  };
 
   const navLinks = [
     { name: "Home", to: "/", icon: <FiHome /> },
@@ -68,11 +137,10 @@ const Navbar = () => {
                 to={link.to}
                 className={({ isActive }) =>
                   `group px-3 md:px-3 lg:px-4 py-2 md:py-2 lg:py-3 text-sm md:text-[15px] lg:text-base relative transition-all duration-300 flex items-center hover:bg-amber-900/20 rounded-3xl border-2
-                ${
-                  isActive
+                ${isActive
                     ? "border-amber-600/50 bg-amber-900/20 shadow-[inset_0_0_15px] shadow-amber-500/20"
                     : "border-amber-900/30 hover:border-amber-600/50"
-                } shadow-md shadow-amber-900/20`
+                  } shadow-md shadow-amber-900/20`
                 }
               >
                 <span className="mr-2 text-sm md:text-[15px] lg:text-base text-amber-500 group-hover:text-amber-300 transition-all">
@@ -96,6 +164,7 @@ const Navbar = () => {
                   </span>
                 )}
               </NavLink>
+              {renderDesktopAuthButton()}
             </div>
           </div>
 
@@ -107,19 +176,16 @@ const Navbar = () => {
             >
               <div className="space-y-2 relative">
                 <span
-                  className={`block w-6 h-[2px] bg-current transition-all duration-300 ${
-                    isOpen ? "rotate-45 translate-y-[10px]" : ""
-                  }`}
+                  className={`block w-6 h-[2px] bg-current transition-all duration-300 ${isOpen ? "rotate-45 translate-y-[10px]" : ""
+                    }`}
                 />
                 <span
-                  className={`block w-6 h-[2px] bg-current transition-all duration-300 ${
-                    isOpen ? "opacity-0" : ""
-                  }`}
+                  className={`block w-6 h-[2px] bg-current transition-all duration-300 ${isOpen ? "opacity-0" : ""
+                    }`}
                 />
                 <span
-                  className={`block w-6 h-[2px] bg-current transition-all duration-300 ${
-                    isOpen ? "-rotate-45 -translate-y-[10px]" : ""
-                  }`}
+                  className={`block w-6 h-[2px] bg-current transition-all duration-300 ${isOpen ? "-rotate-45 -translate-y-[10px]" : ""
+                    }`}
                 />
               </div>
             </button>
@@ -137,12 +203,10 @@ const Navbar = () => {
                 to={link.to}
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `block px-4 py-3 text-sm rounded-xl transition-all items-center ${
-                    isActive
-                      ? "bg-amber-600/30 text-amber-400"
-                      : "text-amber-100 hover:bg-amber-600/20"
-                  } border-2 ${
-                    isActive ? "border-amber-600/50" : "border-amber-900/30"
+                  `block px-4 py-3 text-sm rounded-xl transition-all items-center ${isActive
+                    ? "bg-amber-600/30 text-amber-400"
+                    : "text-amber-100 hover:bg-amber-600/20"
+                  } border-2 ${isActive ? "border-amber-600/50" : "border-amber-900/30"
                   }`
                 }
               >
@@ -152,8 +216,11 @@ const Navbar = () => {
             ))}
 
             <div className="pt-4 border-t-2 border-amber-900/30 space-y-2">
-              <NavLink to='/cart' onClick={() => setIsOpen(false)}
-              className='w-full px-4 py-3 text-center text-amber-100 rounded-xl border-2 border-amber-900/30 hover:border-amber-600/50 items-center justify-center space-x-2 text-sm'>
+              <NavLink
+                to="/cart"
+                onClick={() => setIsOpen(false)}
+                className="w-full px-4 py-3 text-center text-amber-100 rounded-xl border-2 border-amber-900/30 hover:border-amber-600/50 items-center justify-center space-x-2 text-sm"
+              >
                 <FiShoppingCart className="text-lg" />
                 {totalItem > 0 && (
                   <span className="absolute -top-2 -right-2 bg-amber-600 text-amber-100 text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -161,6 +228,7 @@ const Navbar = () => {
                   </span>
                 )}
               </NavLink>
+              {renderMobileAuthButton()}
             </div>
           </div>
         </div>
@@ -170,18 +238,22 @@ const Navbar = () => {
       {showLoginModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-gradient-to-br from-[#2D1B0E] to-[#4a372a] rounded-xl p-6 w-full max-w-[480px] relative border-4 border-amber-700/30 shadow-[0_0_30px] shadow-amber-500/30">
-            <button onClick={() => navigate('/')}
-              className=" absolute top-2 right-2 text-amber-500 hover:text-amber-300 text-2xl ">
-                &times;
-              </button>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent mb-4 text-center">
-                Foodie-Frency
-              </h2>
-              <Login onLoginSuccess={handleLogin} onClose={() => navigate{'/'}} />
+            <button
+              onClick={() => navigate("/")}
+              className=" absolute top-2 right-2 text-amber-500 hover:text-amber-300 text-2xl "
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent mb-4 text-center">
+              Foodie-Frency
+            </h2>
+            <Login
+              onLoginSuccess={handleLoginSuccess}
+              onClose={() => navigate("/")}
+            />
           </div>
         </div>
       )}
-
     </nav>
   );
 };

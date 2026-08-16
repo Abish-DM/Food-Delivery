@@ -21,10 +21,8 @@ const CheckoutPage = () => {
     };
 
     return (
-        {/* Personal Info Section */ }
-
-    )
-
+        <div>{/* Personal Info Section */}</div>
+    );
 }
 
 
